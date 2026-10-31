@@ -1,0 +1,80 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base lang="en" title="Projects" description="Self-hosted platform, GitOps delivery, AI inference and open-source tooling.">
+  <h1>Projects</h1>
+  <p class="sub">Everything here was built, operated and debugged hands-on.</p>
+
+  <article class="case" id="homelab">
+    <h2>Self-hosted homelab platform</h2>
+    <p class="meta">Infrastructure · GitOps · Zero Trust</p>
+    <p>
+      Five Proxmox LXC containers hosting 19 containerized services: websites, git hosting, AI inference,
+      storage and an internal dashboard. The goal is a platform that can be reproduced, rolled back and
+      reached remotely — not a pile of machines that nobody remembers configuring.
+    </p>
+    <h3>What I built</h3>
+    <ul>
+      <li><strong>Portless internal access</strong>: Tailscale MagicDNS + Services VIPs, nine services reachable over HTTPS 443 with no ports or IPs to remember.</li>
+      <li><strong>Minimal public surface</strong>: Cloudflare Tunnel in front of the origin; only the two websites and one webhook path are exposed, everything else returns 404.</li>
+      <li><strong>GitOps delivery</strong>: Gitea webhook → host-side deploy service → per-repository fan-out into the right LXC, with Caddy hot reloads and scoped restarts.</li>
+      <li><strong>Static site pipeline</strong>: a push rebuilds the Astro site in a throwaway node container and publishes it in ~45 seconds.</li>
+      <li><strong>Dual CI path</strong>: GitHub Actions self-hosted runners bridge GitHub and the internal network; a systemd timer re-registers a runner automatically if it goes offline.</li>
+    </ul>
+    <h3>Hard problems</h3>
+    <ul>
+      <li>Cloudflare terminates TLS, so the reverse proxy replaced <code>X-Forwarded-Proto</code> and WordPress entered an infinite HTTPS redirect loop — fixed by injecting the header explicitly plus an application-side fallback.</li>
+      <li>A CUDA runtime library was shadowed by a directory with the same name, crashing the inference process with signal 139 — traced layer by layer and repaired.</li>
+      <li>Caddy directive ordering (handle / route / redirect precedence) silently disabled a route; reproduced with a minimal matcher and fixed.</li>
+    </ul>
+    <p class="stack">Proxmox · Docker · Tailscale · Cloudflare · Caddy · Gitea · GitHub Actions · nginx · MariaDB · Redis</p>
+  </article>
+
+  <article class="case" id="cf-ai-proxy">
+    <h2>cf-ai-proxy</h2>
+    <p class="meta">Open Source · Python · Cloudflare Workers AI</p>
+    <p>
+      Workers AI has a generous free tier, but its REST shape is not fully OpenAI-compatible. This single-file,
+      zero-dependency proxy exposes Workers AI through the standard OpenAI endpoints, so any compatible client
+      can use it without changes.
+    </p>
+    <ul>
+      <li>Standard <code>/v1/models</code>, <code>/v1/chat/completions</code> (SSE streaming) and <code>/v1/images/generations</code>.</li>
+      <li>Built-in <code>/ui</code> text-to-image page for quick checks.</li>
+      <li>Standard library only — tiny Docker image, runs on a NAS, a Raspberry Pi or any internal host.</li>
+      <li>Optional bearer auth and configurable model lists.</li>
+    </ul>
+    <p class="stack">Python · Workers AI · OpenAI API · Docker</p>
+  </article>
+
+  <article class="case" id="ai-stack">
+    <h2>Local AI inference and RAG stack</h2>
+    <p class="meta">AI Engineering · llama.cpp · Embeddings</p>
+    <p>
+      Running a 9B model on a 4 GB GPU while serving chat, roleplay and retrieval-augmented knowledge at the same time.
+    </p>
+    <ul>
+      <li>llama.cpp tuning: full offload, quantized KV cache, 32K context, steady 35 tok/s generation.</li>
+      <li>bge-m3 embeddings served once (CPU) and shared by multiple frontends, avoiding duplicate downloads and indexes.</li>
+      <li>Workers AI integrated as an overflow model; models call tools to produce images on their own.</li>
+      <li>A server-side Telegram bot reads character cards, calls the inference backend and returns generated images.</li>
+    </ul>
+    <p class="stack">llama.cpp · CUDA · bge-m3 · Open WebUI · SillyTavern · Telegram Bot</p>
+  </article>
+
+  <p class="back"><a href="/en/">← Back to home</a></p>
+</Base>
+
+<style is:global>
+  .case { border-top: 1px solid var(--line); padding-top: 26px; margin-top: 30px; }
+  .case:first-of-type { border-top: 0; padding-top: 0; }
+  .case h2 { font-size: 23px; margin: 0 0 4px; }
+  .case h3 { font-size: 15px; margin: 22px 0 8px; color: #c3d0de; }
+  .case .meta { color: var(--muted); font-size: 12px; letter-spacing: .05em; text-transform: uppercase; margin: 0 0 14px; }
+  .case p { line-height: 1.8; }
+  .case ul { line-height: 1.85; padding-left: 20px; }
+  .case code { background: #121a23; border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; font-size: 12.5px; }
+  .case .stack { margin-top: 14px; font-size: 12px; color: var(--muted); }
+  .back { margin-top: 40px; }
+</style>

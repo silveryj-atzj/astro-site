@@ -1,0 +1,126 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+const featured = [
+  {
+    title: 'Self-hosted homelab platform',
+    tag: 'Infrastructure',
+    desc: 'Five Proxmox LXC containers hosting 19 containerized services. Tailscale MagicDNS + Services VIPs give every service a portless internal address; Cloudflare Tunnel exposes only the required public entry points. Config and delivery are fully Git-driven.',
+    points: ['GitOps: push → webhook → per-service hot reload', 'Astro site rebuilt and published in ~45s', 'Self-hosted GitHub Actions runners with auto-heal'],
+    stack: ['Proxmox', 'Docker', 'Tailscale', 'Cloudflare', 'Caddy', 'Gitea'],
+    href: '/en/projects/#homelab',
+  },
+  {
+    title: 'cf-ai-proxy',
+    tag: 'Open Source',
+    desc: 'A single-file, zero-dependency gateway for Cloudflare Workers AI. Exposes a standard OpenAI interface with streaming chat, text-to-image and a small built-in image page.',
+    points: ['OpenAI-compatible /v1/models, chat, images', 'SSE streaming passthrough, no third-party packages', 'Works with Open WebUI, SillyTavern or any SDK'],
+    stack: ['Python', 'Workers AI', 'OpenAI API', 'Docker'],
+    href: '/en/projects/#cf-ai-proxy',
+  },
+  {
+    title: 'Local AI inference & RAG stack',
+    tag: 'AI Engineering',
+    desc: 'llama.cpp on a small GPU plus a shared bge-m3 embedding service. One model stack powers chat, roleplay and retrieval-augmented knowledge, with Workers AI as an overflow path.',
+    points: ['9B model: 35 tok/s, 32K context, quantized KV cache', 'bge-m3 embeddings shared across frontends', 'Models call tools to generate images on their own'],
+    stack: ['llama.cpp', 'CUDA', 'bge-m3', 'Open WebUI', 'SillyTavern'],
+    href: '/en/projects/#ai-stack',
+  },
+];
+---
+
+<Base
+  lang="en"
+  title="silveryj · Self-hosting & Infrastructure"
+  description="Self-hosted homelab, GitOps delivery and AI inference engineering."
+>
+  <section class="hero">
+    <p class="eyebrow">Homelab · Infrastructure · AI Engineering</p>
+    <h1>silveryj</h1>
+    <p class="sub">
+      I run a small self-hosted cloud at home: Proxmox for virtualization, Tailscale for the private network,
+      Cloudflare at the edge, and Git for everything that can be versioned. This site documents the engineering
+      work, the incidents and the lessons.
+    </p>
+    <p class="hero-links">
+      <a class="btn" href="/en/projects/">Projects</a>
+      <a class="btn ghost" href="/blog/">Blog</a>
+      <a class="btn ghost" href="/en/about/">About</a>
+    </p>
+  </section>
+
+  <h2>Selected projects</h2>
+  <div class="projects">
+    {featured.map((p) => (
+      <a class="project-card" href={p.href}>
+        <div class="pc-head">
+          <strong>{p.title}</strong>
+          <span class="pc-tag">{p.tag}</span>
+        </div>
+        <p class="pc-desc">{p.desc}</p>
+        <ul class="pc-points">
+          {p.points.map((pt) => <li>{pt}</li>)}
+        </ul>
+        <div class="pc-stack">
+          {p.stack.map((s) => <span>{s}</span>)}
+        </div>
+      </a>
+    ))}
+  </div>
+
+  {posts.length > 0 && (
+    <section>
+      <h2>Latest posts</h2>
+      <p class="meta">Blog posts are currently written in Chinese.</p>
+      <ul class="post-list">
+        {posts.map((post) => (
+          <li>
+            <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+            <time>{post.data.date.toISOString().slice(0, 10)}</time>
+            {post.data.description && <p>{post.data.description}</p>}
+          </li>
+        ))}
+      </ul>
+      <p style="margin-top: 18px"><a href="/blog/">All posts →</a></p>
+    </section>
+  )}
+</Base>
+
+<style is:global>
+  .hero { padding: 8px 0 28px; }
+  .eyebrow {
+    font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 10px;
+  }
+  .hero h1 { font-size: 42px; margin: 0 0 8px; letter-spacing: -.02em; }
+  .hero .sub { font-size: 15.5px; line-height: 1.75; max-width: 680px; color: var(--muted); }
+  .hero-links { margin: 22px 0 0; display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 9px 18px; border-radius: 10px;
+    background: var(--accent); color: #07131f; text-decoration: none;
+    font-size: 13.5px; font-weight: 600;
+  }
+  .btn.ghost { background: transparent; border: 1px solid var(--line); color: var(--fg); }
+  .btn.ghost:hover { border-color: #3f5a78; }
+
+  .projects { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin: 14px 0 34px; }
+  .project-card {
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 20px; border-radius: 14px; text-decoration: none; color: inherit;
+    background: var(--card); border: 1px solid var(--line);
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .project-card:hover { transform: translateY(-3px); border-color: #3f5a78; }
+  .pc-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .pc-head strong { font-size: 16.5px; }
+  .pc-tag { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
+  .pc-desc { margin: 0; font-size: 13.5px; line-height: 1.7; color: #c3d0de; }
+  .pc-points { margin: 0; padding-left: 17px; font-size: 12.5px; line-height: 1.7; color: var(--muted); }
+  .pc-stack { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+  .pc-stack span { font-size: 11px; color: var(--muted); background: #101720; border: 1px solid var(--line); border-radius: 6px; padding: 2px 7px; }
+</style>

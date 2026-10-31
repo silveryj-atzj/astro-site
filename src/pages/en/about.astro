@@ -1,0 +1,91 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base lang="en" title="About" description="About silveryj: self-hosting, infrastructure and AI engineering.">
+  <h1>About</h1>
+  <p class="sub">
+    I like building things myself and then keeping them running. This site and the platform behind it are the result.
+  </p>
+
+  <h2>What I do</h2>
+  <p>
+    Most of my time goes into a small server at home: Proxmox virtualization, containerized services, Tailscale
+    networking and the Cloudflare edge. In parallel I run local language models and wire chat, retrieval,
+    roleplay and image generation into one usable stack.
+  </p>
+  <p>
+    I care less about "it runs" and more about: is the config in Git, is deployment automatic, can I debug it
+    when it breaks, are secrets contained, and will it survive disk and traffic limits.
+  </p>
+
+  <h2>Skills</h2>
+  <div class="skills">
+    <div>
+      <h3>Infrastructure</h3>
+      <p>Proxmox VE · Linux · Docker / Compose · Caddy · nginx · MariaDB · Redis · Samba</p>
+    </div>
+    <div>
+      <h3>Networking & Edge</h3>
+      <p>Tailscale (MagicDNS / Services) · Cloudflare (Tunnel / Access / DNS / Workers AI) · reverse proxy & TLS</p>
+    </div>
+    <div>
+      <h3>Automation & GitOps</h3>
+      <p>Git (Gitea / GitHub) · webhook delivery · GitHub Actions self-hosted runners · Bash / Python / PowerShell</p>
+    </div>
+    <div>
+      <h3>AI Engineering</h3>
+      <p>llama.cpp · CUDA inference · embeddings (bge-m3) · RAG · agent tool calling · OpenAI-compatible APIs</p>
+    </div>
+    <div>
+      <h3>Web</h3>
+      <p>Astro · WordPress · HTML / CSS / TypeScript · responsive and accessibility basics</p>
+    </div>
+  </div>
+
+  <h2>Timeline</h2>
+  <ul class="timeline">
+    <li>
+      <time>2026 · 10</time>
+      <div>
+        <strong>Self-hosted platform consolidated</strong>
+        <p>GitOps delivery, GitHub Actions bidirectional sync, Cloudflare Access zero trust, AI inference and RAG stack integrated.</p>
+      </div>
+    </li>
+    <li>
+      <time>2026 · 10</time>
+      <div>
+        <strong>cf-ai-proxy open-sourced</strong>
+        <p>Cloudflare Workers AI brought into the local AI stack as a zero-dependency single-file gateway.</p>
+      </div>
+    </li>
+    <li>
+      <time>Earlier</time>
+      <div>
+        <strong>Incremental builds</strong>
+        <p>Started from WordPress and static sites, gradually replaced with infrastructure I maintain myself.</p>
+      </div>
+    </li>
+  </ul>
+
+  <h2>Contact</h2>
+  <p>
+    Email: <a href="mailto:adriantzj07@gmail.com">adriantzj07@gmail.com</a><br />
+    GitHub: <a href="https://github.com/silveryj-atzj" target="_blank" rel="noopener noreferrer">silveryj-atzj</a>
+  </p>
+
+  <p class="back"><a href="/en/">← Back to home</a></p>
+</Base>
+
+<style is:global>
+  .skills { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin: 16px 0 8px; }
+  .skills > div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .skills h3 { margin: 0 0 6px; font-size: 14px; }
+  .skills p { margin: 0; font-size: 13px; line-height: 1.7; color: var(--muted); }
+  .timeline { list-style: none; padding: 0; margin: 16px 0; }
+  .timeline li { display: flex; gap: 18px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .timeline time { flex: 0 0 90px; font-size: 12px; color: var(--muted); padding-top: 3px; }
+  .timeline strong { display: block; margin-bottom: 3px; }
+  .timeline p { margin: 0; font-size: 13.5px; color: #c3d0de; line-height: 1.7; }
+  .back { margin-top: 36px; }
+</style>
