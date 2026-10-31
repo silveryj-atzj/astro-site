@@ -1,0 +1,91 @@
+---
+const { title = 'silveryj', description = '个人站 · 自托管服务 · 写点东西' } = Astro.props as {
+  title?: string;
+  description?: string;
+};
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title === 'silveryj' ? title : `${title} · silveryj`}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title="silveryj 博客" href="/rss.xml" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">silveryj</a>
+      <nav>
+        <a href="/">首页</a>
+        <a href="/blog/">博客</a>
+        <a href="https://silveryj-atzj.me" target="_blank" rel="noopener">WordPress</a>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer>
+      <p>© {year} silveryj-atzj.me · Astro 静态站 · <a href="/rss.xml">RSS</a></p>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    color-scheme: dark;
+    --bg: #0b0d10;
+    --card: #14181d;
+    --line: #232a32;
+    --fg: #e6edf3;
+    --muted: #8b98a5;
+    --accent: #6ea8fe;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(1200px 600px at 50% -10%, #16202b 0%, var(--bg) 60%);
+    color: var(--fg);
+    font: 16px/1.7 ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'Noto Sans SC', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .site-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px; border-bottom: 1px solid var(--line);
+    max-width: 980px; width: 100%; margin: 0 auto;
+  }
+  .brand { font-weight: 700; color: var(--fg); text-decoration: none; letter-spacing: .02em; }
+  .site-header nav { display: flex; gap: 18px; }
+  .site-header nav a { color: var(--muted); text-decoration: none; font-size: 14px; }
+  .site-header nav a:hover { color: var(--fg); }
+  main { width: 100%; max-width: 980px; margin: 0 auto; padding: 56px 24px 40px; flex: 1; }
+  h1 { font-size: clamp(32px, 5vw, 48px); margin: 0 0 8px; letter-spacing: -0.02em; }
+  h2 { margin-top: 40px; }
+  p.sub { margin: 0 0 36px; color: var(--muted); }
+  a { color: var(--accent); }
+  .post-list { list-style: none; padding: 0; margin: 32px 0 0; display: grid; gap: 14px; }
+  .post-list li { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  .post-list a { font-weight: 600; font-size: 18px; text-decoration: none; }
+  .post-list time { display: block; color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .post-list p { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
+  .prose { max-width: 720px; }
+  .prose h2 { font-size: 24px; margin-top: 36px; }
+  .prose h3 { font-size: 19px; }
+  .prose code { background: #1b2229; padding: 2px 6px; border-radius: 5px; font-size: 90%; }
+  .prose pre { background: #11161b; border: 1px solid var(--line); padding: 16px; border-radius: 10px; overflow-x: auto; }
+  .prose pre code { background: none; padding: 0; }
+  .prose blockquote { border-left: 3px solid var(--accent); margin: 20px 0; padding: 4px 16px; color: var(--muted); }
+  .prose img { max-width: 100%; border-radius: 10px; }
+  footer { border-top: 1px solid var(--line); padding: 18px 24px; color: var(--muted); font-size: 13px; text-align: center; }
+  footer a { color: var(--muted); }
+  .grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+  .grid a { display: flex; flex-direction: column; gap: 4px; padding: 16px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; text-decoration: none; color: inherit; transition: transform .15s ease, border-color .15s ease; }
+  .grid a:hover { transform: translateY(-2px); border-color: #3a4b5f; }
+  .grid strong { font-weight: 600; }
+  .grid span { color: var(--muted); font-size: 14px; }
+</style>

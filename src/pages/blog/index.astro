@@ -1,0 +1,23 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+
+<Base title="博客" description="silveryj 的博客">
+  <h1>博客</h1>
+  <p class="sub">共 {posts.length} 篇 · 支持 RSS：<a href="/rss.xml">/rss.xml</a></p>
+
+  <ul class="post-list">
+    {posts.map((post) => (
+      <li>
+        <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+        <time>{post.data.date.toISOString().slice(0, 10)}</time>
+        {post.data.description && <p>{post.data.description}</p>}
+      </li>
+    ))}
+  </ul>
+</Base>

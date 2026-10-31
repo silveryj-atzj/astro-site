@@ -1,0 +1,49 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+const links = [
+  { name: '博客', desc: 'Astro 静态站', href: '/blog/' },
+  { name: 'WordPress', desc: '主站 · 动态', href: 'https://silveryj-atzj.me' },
+  { name: 'Open WebUI', desc: 'AI 聊天 · RAG · 联网', href: 'https://ai.tailbd4708.ts.net' },
+  { name: 'SillyTavern', desc: '角色扮演', href: 'https://ai.tailbd4708.ts.net:8443' },
+  { name: 'Homepage', desc: '服务总览', href: 'https://homepage.tailbd4708.ts.net' },
+  { name: 'Proxmox VE', desc: '虚拟化', href: 'https://pve.tailbd4708.ts.net' },
+];
+---
+
+<Base>
+  <h1>silveryj</h1>
+  <p class="sub">个人站 · 自托管实验室 · 写点东西</p>
+
+  <ul class="grid">
+    {links.map((l) => (
+      <li>
+        <a href={l.href}>
+          <strong>{l.name}</strong>
+          <span>{l.desc}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  {posts.length > 0 && (
+    <>
+      <h2>最新文章</h2>
+      <ul class="post-list">
+        {posts.map((post) => (
+          <li>
+            <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+            <time>{post.data.date.toISOString().slice(0, 10)}</time>
+            {post.data.description && <p>{post.data.description}</p>}
+          </li>
+        ))}
+      </ul>
+      <p style="margin-top: 20px"><a href="/blog/">全部文章 →</a></p>
+    </>
+  )}
+</Base>
