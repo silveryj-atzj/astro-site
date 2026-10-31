@@ -349,39 +349,64 @@ const nodeTypes = { card: CardNode };
 
 /* ============================ 主组件 ============================ */
 const LS_KEY = 'arch-layout-v4';
+const LAYOUT_API = '/arch-layout/31bce28b62eeae25b1ba00723227949f';
 
 function Diagram() {
   const initial = useMemo(() => buildInitial(), []);
   const [nodes, setNodes, onNodesChange] = useNodesState(initial.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initial.edges);
   const [detail, setDetail] = useState<{ title: string; sub?: string; text?: string; url?: string } | null>(null);
-  const [saved, setSaved] = useState<'idle' | 'saved'>('idle');
+  const [saved, setSaved] = useState<'idle' | 'saved' | 'error'>('idle');
+  const [layoutSource, setLayoutSource] = useState<'default' | 'local' | 'server'>('default');
   const { fitView, toObject } = useReactFlow();
   const fileRef = useRef<HTMLInputElement>(null);
 
-  /* 载入本地存档 */
+  /* 载入存档：优先服务器，其次 localStorage */
   useEffect(() => {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return;
-    try {
-      const saved = JSON.parse(raw) as { nodes: Record<string, { x: number; y: number }> };
+    const apply = (map: Record<string, { x: number; y: number }>) => {
       setNodes((nds) =>
         nds.map((n) => {
-          const p = saved.nodes[n.id];
+          const p = map[n.id];
           return p ? { ...n, position: { x: p.x, y: p.y } } : n;
         })
       );
-    } catch { /* ignore */ }
-    setTimeout(() => fitView({ padding: 0.08, duration: 300 }), 120);
+      setTimeout(() => fitView({ padding: 0.08, duration: 300 }), 140);
+    };
+    (async () => {
+      try {
+        const r = await fetch(LAYOUT_API, { cache: 'no-store' });
+        if (r.ok) {
+          const data = await r.json();
+          if (data?.nodes && Object.keys(data.nodes).length) {
+            setLayoutSource('server');
+            apply(data.nodes);
+            return;
+          }
+        }
+      } catch { /* ignore */ }
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return;
+        setLayoutSource('local');
+        apply(JSON.parse(raw).nodes);
+      } catch { /* ignore */ }
+    })();
   }, []);
 
   const save = useCallback(
     (nds = nodes) => {
       const map: Record<string, { x: number; y: number }> = {};
       for (const n of nds) map[n.id] = { x: n.position.x, y: n.position.y };
-      localStorage.setItem(LS_KEY, JSON.stringify({ ts: Date.now(), nodes: map }));
+      const payload = { version: 1, ts: Date.now(), nodes: map };
+      localStorage.setItem(LS_KEY, JSON.stringify(payload));
       setSaved('saved');
-      setTimeout(() => setSaved('idle'), 1600);
+      setLayoutSource('local');
+      fetch(LAYOUT_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        .then((r) => {
+          if (r.ok) { setLayoutSource('server'); setTimeout(() => setSaved('idle'), 1600); }
+          else setSaved('error');
+        })
+        .catch(() => setSaved('error'));
     },
     [nodes]
   );
