@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Background,
   Controls,
@@ -543,10 +543,32 @@ function Diagram() {
   );
 }
 
+/* 渲染出错时把错误显示在页面上，避免白屏难排查 */
+class ArchErrorBoundary extends React.Component<{ children: React.ReactNode }, { error: Error | null }> {
+  state = { error: null as Error | null };
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+  componentDidCatch(error: Error) {
+    console.error('[arch] render error', error);
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: 40, color: '#ff9b9b', fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+          架构图渲染出错：{String(this.state.error?.message || this.state.error)}
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 export default function ArchDiagram() {
   return (
     <ReactFlowProvider>
-      <Diagram />
+      <ArchErrorBoundary>
+        <Diagram />
+      </ArchErrorBoundary>
     </ReactFlowProvider>
   );
 }
