@@ -9,7 +9,10 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
 
 <Base title="博客" description="silveryj 的博客">
   <h1>博客</h1>
-  <p class="sub">共 {posts.length} 篇 · 支持 RSS：<a href="/rss.xml">/rss.xml</a></p>
+  <p class="sub">
+    共 {posts.length} 篇 · <a href="/rss.xml">RSS</a> · <a href="/tags/">标签</a> · <a href="/archive/">归档</a> ·
+    <a href="/search/">搜索</a>
+  </p>
 
   <ul class="post-list">
     {posts.map((post) => (
@@ -17,6 +20,13 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
         <a href={`/blog/${post.id}/`}>{post.data.title}</a>
         <time>{post.data.date.toISOString().slice(0, 10)}</time>
         {post.data.description && <p>{post.data.description}</p>}
+        {post.data.tags.length > 0 && (
+          <p class="tags">
+            {post.data.tags.map((tag) => (
+              <a class="chip" href={`/tags/${encodeURIComponent(tag)}/`}>#{tag}</a>
+            ))}
+          </p>
+        )}
       </li>
     ))}
   </ul>

@@ -3,20 +3,44 @@ import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => !data.draft);
-  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+  const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+    (a, b) => a.data.date.valueOf() - b.data.date.valueOf()
+  );
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      prev: i > 0 ? posts[i - 1] : null,
+      next: i < posts.length - 1 ? posts[i + 1] : null,
+    },
+  }));
 }
 
-const { post } = Astro.props;
+const { post, prev, next } = Astro.props;
 const { Content } = await render(post);
 const date = post.data.date.toISOString().slice(0, 10);
+const body = post.body ?? '';
+const chars = body.replace(/\s+/g, '').length;
+const minutes = Math.max(1, Math.round(chars / 400));
 ---
 
 <Base title={post.data.title} description={post.data.description}>
   <article class="prose">
     <h1>{post.data.title}</h1>
-    <p class="sub">{date} · silveryj</p>
+    <p class="meta">{date} · 约 {minutes} 分钟 · {chars} 字</p>
+    {post.data.tags.length > 0 && (
+      <p>
+        {post.data.tags.map((tag) => (
+          <a class="chip" href={`/tags/${encodeURIComponent(tag)}/`}>#{tag}</a>
+        ))}
+      </p>
+    )}
     <Content />
-    <p style="margin-top: 40px"><a href="/blog/">← 返回博客列表</a></p>
+
+    <nav class="pager">
+      <span>{prev ? <a href={`/blog/${prev.id}/`}>← {prev.data.title}</a> : null}</span>
+      <span class="next">{next ? <a href={`/blog/${next.id}/`}>{next.data.title} →</a> : null}</span>
+    </nav>
+    <p style="margin-top: 24px"><a href="/blog/">← 返回博客列表</a></p>
   </article>
 </Base>

@@ -22,6 +22,9 @@ const year = new Date().getFullYear();
       <nav>
         <a href="/">首页</a>
         <a href="/blog/">博客</a>
+        <a href="/tags/">标签</a>
+        <a href="/archive/">归档</a>
+        <a href="/search/">搜索</a>
         <a href="https://silveryj-atzj.me" target="_blank" rel="noopener">WordPress</a>
       </nav>
     </header>
@@ -88,4 +91,20 @@ const year = new Date().getFullYear();
   .grid a:hover { transform: translateY(-2px); border-color: #3a4b5f; }
   .grid strong { font-weight: 600; }
   .grid span { color: var(--muted); font-size: 14px; }
+
+  /* 标签云 / 标签 chips */
+  .tag-cloud { list-style: none; margin: 28px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+  .tag-cloud a { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; text-decoration: none; color: var(--fg); font-size: 14px; transition: border-color .15s ease, transform .15s ease; }
+  .tag-cloud a:hover { border-color: #3a4b5f; transform: translateY(-1px); }
+  .tag-cloud .count { color: var(--muted); font-size: 12px; }
+  .chip { display: inline-block; padding: 2px 9px; margin: 0 6px 6px 0; background: #161d24; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 12px; text-decoration: none; }
+  .chip:hover { color: var(--fg); border-color: #3a4b5f; }
+
+  /* 搜索框 */
+  .search-input { width: 100%; margin: 20px 0 12px; padding: 12px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; color: var(--fg); font-size: 15px; outline: none; }
+  .search-input:focus { border-color: var(--accent); }
+  .meta { color: var(--muted); font-size: 13px; margin: 4px 0 24px; }
+  .pager { display: flex; justify-content: space-between; gap: 16px; margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 14px; }
+  .pager a { text-decoration: none; }
+  .pager .next { text-align: right; }
 </style>
