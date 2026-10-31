@@ -110,8 +110,7 @@ const NODES: Cfg[] = [
   { id: 'ts-cloud', kind: 'net', x: 1820, y: 1710, w: 300, h: 60, title: 'Tailscale 控制面', sub: 'MagicDNS / 审批' },
 ];
 
-const LINKS: Link[] = [
-  { from: 'browser', to: 'cf-dns', num: 1, kind: 'data' },
+const LINKS: Link[] = [  { from: 'browser', to: 'cf-dns', num: 1, kind: 'data' },
   { from: 'laptop', to: 'svc', num: 2, kind: 'data' },
   { from: 'cf-dns', to: 'cf-tunnel', kind: 'cloud' },
   { from: 'cf-tunnel', to: 'caddy', num: 3, kind: 'data' },
@@ -142,6 +141,49 @@ const LINKS: Link[] = [
   { from: 'tgbot', to: 'cfproxy', num: 13, kind: 'data' },
   { from: 'cf-email', to: 'gmail', num: 14, kind: 'cloud' },
 ];
+
+/* 服务的内网（tailnet）直链 */
+const URLS: Record<string, string> = {
+  'cf-tunnel': 'https://gateway-caddy.tailbd4708.ts.net',
+  'cf-access': 'https://one.dash.cloudflare.com',
+  'cf-ai': 'https://dash.cloudflare.com',
+  'cf-email': 'https://dash.cloudflare.com',
+  'cf-idp': 'https://one.dash.cloudflare.com',
+  browser: 'https://homepage.tailbd4708.ts.net',
+  magicdns: 'https://homepage.tailbd4708.ts.net',
+  svc: 'https://homepage.tailbd4708.ts.net',
+  serve: 'https://homepage.tailbd4708.ts.net',
+  tsapi: 'https://login.tailscale.com/admin/machines',
+  infra: 'https://web-gitea.tailbd4708.ts.net/atzj/infra',
+  astrocl: 'https://web-gitea.tailbd4708.ts.net/atzj/web-astro',
+  caddy: 'https://gateway-caddy.tailbd4708.ts.net',
+  'astro-st': 'https://blog.silveryj-atzj.me',
+  'port-gw': 'https://gateway-portainer.tailbd4708.ts.net',
+  docs: 'https://gateway-caddy.tailbd4708.ts.net/arch/',
+  wp: 'https://silveryj-atzj.me',
+  mariadb: 'https://web-phpmyadmin.tailbd4708.ts.net',
+  redis: 'https://web-phpmyadmin.tailbd4708.ts.net',
+  pma: 'https://web-phpmyadmin.tailbd4708.ts.net',
+  gitea: 'https://web-gitea.tailbd4708.ts.net',
+  'port-web': 'https://web-portainer.tailbd4708.ts.net',
+  'run-wp': 'https://github.com/silveryj-atzj/website-repo/actions',
+  homepage: 'https://homepage.tailbd4708.ts.net',
+  'port-hp': 'https://homepage-portainer.tailbd4708.ts.net',
+  samba: 'smb://192.168.8.61',
+  llama: 'https://ai-llama.tailbd4708.ts.net',
+  embed: 'https://ai-llama.tailbd4708.ts.net',
+  oi: 'https://ai-openwebui.tailbd4708.ts.net',
+  st: 'https://ai-sillytavern.tailbd4708.ts.net',
+  cfproxy: 'https://ai.tailbd4708.ts.net:8096/ui',
+  'port-ai': 'https://ai-portainer.tailbd4708.ts.net',
+  searxng: 'https://ai-searxng.tailbd4708.ts.net',
+  tgbot: 'https://tg.silveryj-atzj.me',
+  'run-astro': 'https://github.com/silveryj-atzj/astro-site/actions',
+  gh: 'https://github.com/silveryj-atzj',
+  hugging: 'https://huggingface.co',
+  gmail: 'https://mail.google.com',
+  'ts-cloud': 'https://login.tailscale.com/admin/machines',
+};
 
 const DETAILS: Record<string, string> = {
   'cf-dns': '托管 silveryj-atzj.me 与 blog. 子域；公网只暴露主站、博客、/tg/strange-signal。',
@@ -241,7 +283,7 @@ function buildInitial(): { nodes: RFNode[]; edges: Edge[] } {
       id: n.id,
       type: 'card',
       position: { x: r.x, y: r.y },
-      data: { title: n.title, sub: n.sub, kind: n.kind, detail: DETAILS[n.id] },
+      data: { title: n.title, sub: n.sub, kind: n.kind, detail: DETAILS[n.id], url: URLS[n.id] },
       parentId: pickParent(n, ZONES)?.id,
       extent: 'parent',
       style: { width: n.w, height: n.h },
@@ -312,7 +354,7 @@ function Diagram() {
   const initial = useMemo(() => buildInitial(), []);
   const [nodes, setNodes, onNodesChange] = useNodesState(initial.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initial.edges);
-  const [detail, setDetail] = useState<{ title: string; sub?: string; text?: string } | null>(null);
+  const [detail, setDetail] = useState<{ title: string; sub?: string; text?: string; url?: string } | null>(null);
   const [saved, setSaved] = useState<'idle' | 'saved'>('idle');
   const { fitView, toObject } = useReactFlow();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -410,7 +452,7 @@ function Diagram() {
           onEdgesChange={onEdgesChange}
           onNodeDragStop={(_, __, dragged) => save(nodes.map((n) => (n.id === dragged.id ? { ...n, position: dragged.position } : n)))}
           onNodeClick={(_, n) => {
-            if (n.type === 'card') setDetail({ title: n.data.title as string, sub: n.data.sub as string, text: n.data.detail as string });
+            if (n.type === 'card') setDetail({ title: n.data.title as string, sub: n.data.sub as string, text: n.data.detail as string, url: n.data.url as string });
           }}
           onPaneClick={() => setDetail(null)}
           snapToGrid
@@ -442,6 +484,12 @@ function Diagram() {
             <h3>{detail.title}</h3>
             {detail.sub && <div className="af-detail-sub">{detail.sub}</div>}
             <p>{detail.text || '（暂无补充说明）'}</p>
+            {detail.url && (
+              <a className="af-open" href={detail.url} target="_blank" rel="noreferrer">
+                打开服务 ↗
+              </a>
+            )}
+            {detail.url && <div className="af-detail-url">{detail.url}</div>}
           </aside>
         )}
 

@@ -129,4 +129,17 @@ import ArchDiagram from '../components/ArchDiagram';
   .af-dot { display: inline-block; width: 9px; height: 9px; border-radius: 3px; }
   .af-line { display: inline-block; width: 22px; border-top: 2px solid; }
   .af-dash { border-top-style: dashed; }
+  /* 选中卡片高亮边框 */
+  .react-flow__node.selected .af-card {
+    border-color: #7fb0e8;
+    box-shadow: 0 0 0 2px rgba(111, 156, 203, .38), 0 14px 32px rgba(0, 0, 0, .5);
+  }
+  /* 详情面板里的内网直链 */
+  .af-detail a.af-open {
+    display: inline-block; margin-top: 14px; padding: 8px 15px; border-radius: 9px;
+    background: #1b2b3f; border: 1px solid #3b82f6; color: #d7e9ff;
+    text-decoration: none; font-size: 12.5px; font-weight: 600;
+  }
+  .af-detail a.af-open:hover { background: #24405c; }
+  .af-detail-url { margin-top: 8px; font-size: 11px; color: #5c6b7c; word-break: break-all; }
 </style>
