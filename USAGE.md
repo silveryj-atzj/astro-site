@@ -105,3 +105,5 @@ git push
 
 已接 Gitea webhook：push 到 tzj/web-astro 后，服务器会自动构建并部署（不需要再跑 deploy.ps1）。
 日志：PVE 宿主机 /var/log/infra-hook.log。
+
+<!-- sync test 2026-10-31 21:18 -->
