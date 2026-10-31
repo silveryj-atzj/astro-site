@@ -211,108 +211,59 @@ const DETAILS: Record<string, string> = {
 };
 
 /* ============================ 布局计算 ============================ */
-type RFNode = Node<{ title: string; sub?: string; kind: Kind; detail?: string; label?: string }>;
+type RFNode = Node<{ title: string; sub?: string; kind?: Kind; detail?: string; url?: string; label?: string }>;
 
-function contains(a: Zone, b: { x: number; y: number; w: number; h: number }) {
-  const cx = b.x + b.w / 2;
-  const cy = b.y + b.h / 2;
-  return cx >= a.x && cx <= a.x + a.w && cy >= a.y && cy <= a.y + a.h;
-}
-
-function pickParent(item: { x: number; y: number; w: number; h: number }, zones: Zone[], id?: string) {
-  let best: Zone | null = null;
-  let bestArea = Infinity;
-  for (const z of zones) {
-    if (z.id === id) continue;
-    const area = z.w * z.h;
-    if (area < bestArea && contains(z, item)) {
-      best = z;
-      bestArea = area;
-    }
-  }
-  return best;
-}
-
+/* 设计：分组只做背景（不可交互），卡片全部是顶层节点、绝对坐标、自由拖拽 */
 function buildInitial(): { nodes: RFNode[]; edges: Edge[] } {
-  // 分组父子关系
-  const zoneParent = new Map<string, string | null>();
-  for (const z of ZONES) {
-    const p = pickParent(z, ZONES, z.id);
-    zoneParent.set(z.id, p ? p.id : null);
-  }
-  const abs = new Map<string, { x: number; y: number; w: number; h: number }>();
-  for (const z of ZONES) abs.set(z.id, { x: z.x, y: z.y, w: z.w, h: z.h });
-  for (const n of NODES) abs.set(n.id, { x: n.x, y: n.y, w: n.w, h: n.h });
-
-  const rel = (id: string) => {
-    const a = abs.get(id)!;
-    const parent = [...zoneParent.entries()].find(([, p]) => p === null) ? null : null;
-    // 找直接父 zone
-    let parentZone: Zone | null = null;
-    if (ZONES.some((z) => z.id === id)) {
-      const p = zoneParent.get(id);
-      parentZone = p ? ZONES.find((z) => z.id === p)! : null;
-    } else {
-      parentZone = pickParent(a, ZONES);
-      if (parentZone && parentZone.id === id) parentZone = null;
-    }
-    const pa = parentZone ? abs.get(parentZone.id)! : { x: 0, y: 0, w: 0, h: 0 };
-    return { x: a.x - pa.x, y: a.y - pa.y, w: a.w, h: a.h };
-  };
-
   const nodes: RFNode[] = [];
+
   for (const z of ZONES) {
-    const r = rel(z.id);
-    const p = zoneParent.get(z.id) || undefined;
     nodes.push({
       id: z.id,
-      type: 'group',
-      position: { x: r.x, y: r.y },
-      data: { title: z.title, sub: z.sub, kind: 'net' as Kind, label: `${z.title}${z.sub ? '  ·  ' + z.sub : ''}` },
-      parentId: p,
-      extent: 'parent',
+      type: 'zone',
+      position: { x: z.x, y: z.y },
+      data: { title: z.title, sub: z.sub },
       draggable: false,
       selectable: false,
+      connectable: false,
+      focusable: false,
       style: { width: z.w, height: z.h },
-      zIndex: 0,
+      zIndex: 1,
     } as unknown as RFNode);
   }
+
   for (const n of NODES) {
-    const r = rel(n.id);
     nodes.push({
       id: n.id,
       type: 'card',
-      position: { x: r.x, y: r.y },
+      position: { x: n.x, y: n.y },
       data: { title: n.title, sub: n.sub, kind: n.kind, detail: DETAILS[n.id], url: URLS[n.id] },
-      parentId: pickParent(n, ZONES)?.id,
-      extent: 'parent',
       style: { width: n.w, height: n.h },
-      zIndex: 2,
+      zIndex: 5,
     } as unknown as RFNode);
   }
 
-  const absOf = (id: string) => abs.get(id)!;
-  const pick = (a: { x: number; y: number; w: number; h: number }, b: { x: number; y: number; w: number; h: number }) => {
+  const absOf = (id: string) => {
+    const z = ZONES.find((x) => x.id === id);
+    if (z) return { x: z.x, y: z.y, w: z.w, h: z.h };
+    const n = NODES.find((x) => x.id === id);
+    return n ? { x: n.x, y: n.y, w: n.w, h: n.h } : { x: 0, y: 0, w: 0, h: 0 };
+  };
+  const pick = (a: any, b: any) => {
     const dx = b.x + b.w / 2 - (a.x + a.w / 2);
     const dy = b.y + b.h / 2 - (a.y + a.h / 2);
-    return Math.abs(dx) > Math.abs(dy)
-      ? dx > 0
-        ? { sourceHandle: 'r', targetHandle: 'l' }
-        : { sourceHandle: 'l', targetHandle: 'r' }
-      : dy > 0
-        ? { sourceHandle: 'b', targetHandle: 't' }
-        : { sourceHandle: 't', targetHandle: 'b' };
+    const horiz = Math.abs(dx) > Math.abs(dy);
+    if (horiz) return dx > 0 ? { sourceHandle: 'r', targetHandle: 'l' } : { sourceHandle: 'l', targetHandle: 'r' };
+    return dy > 0 ? { sourceHandle: 'b', targetHandle: 't' } : { sourceHandle: 't', targetHandle: 'b' };
   };
 
   const edges: Edge[] = LINKS.map((l) => {
-    const a = absOf(l.from);
-    const b = absOf(l.to);
     const stroke = COLORS[l.kind] || COLORS.data;
     return {
       id: `${l.from}->${l.to}`,
       source: l.from,
       target: l.to,
-      ...pick(a, b),
+      ...pick(absOf(l.from), absOf(l.to)),
       type: 'smoothstep',
       label: l.num ? String(l.num) : undefined,
       labelShowBg: true,
@@ -345,10 +296,18 @@ function CardNode({ data }: any) {
   );
 }
 
-const nodeTypes = { card: CardNode };
+function ZoneNode({ data }: any) {
+  return (
+    <div className="af-zone-box">
+      <div className="af-zone-title">{data.title}</div>
+      {data.sub && <div className="af-zone-sub">{data.sub}</div>}
+    </div>
+  );
+}
+const nodeTypes = { card: CardNode, zone: ZoneNode };
 
 /* ============================ 主组件 ============================ */
-const LS_KEY = 'arch-layout-v4';
+const LS_KEY = 'arch-layout-v5';
 const LAYOUT_API = '/arch-layout/31bce28b62eeae25b1ba00723227949f';
 
 function Diagram() {
