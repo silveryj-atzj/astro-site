@@ -465,7 +465,17 @@ function Diagram() {
           style={{ display: 'none' }}
           onChange={(e) => e.target.files?.[0] && importJson(e.target.files[0])}
         />
-        <span className={`af-saved ${saved}`}>{saved === 'saved' ? '已保存 ✓' : ''}</span>
+        <span className={`af-saved ${saved}`} title={`布局来源：${layoutSource}`}>
+          {saved === 'saved'
+            ? '已保存 ✓'
+            : saved === 'error'
+              ? '保存失败'
+              : layoutSource === 'server'
+                ? '服务器布局'
+                : layoutSource === 'local'
+                  ? '本地布局'
+                  : '默认布局'}
+        </span>
       </div>
 
       <div className="af-canvas">
