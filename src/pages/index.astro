@@ -6,33 +6,73 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
 
-const links = [
-  { name: '博客', desc: 'Astro 静态站', href: '/blog/' },
-  { name: 'WordPress', desc: '主站 · 动态', href: 'https://silveryj-atzj.me' },
-  { name: 'Open WebUI', desc: 'AI 聊天 · RAG · 联网', href: 'https://ai.tailbd4708.ts.net' },
-  { name: 'SillyTavern', desc: '角色扮演', href: 'https://ai.tailbd4708.ts.net:8443' },
-  { name: 'Homepage', desc: '服务总览', href: 'https://homepage.tailbd4708.ts.net' },
-  { name: 'Proxmox VE', desc: '虚拟化', href: 'https://pve.tailbd4708.ts.net' },
+const featured = [
+  {
+    title: '自托管家庭云平台',
+    tag: 'Infrastructure',
+    desc: 'Proxmox 上 5 个 LXC / 19 个容器化服务。Tailscale MagicDNS + Services VIP 做内网零端口访问，Cloudflare Tunnel 只暴露必要入口；配置与部署全部走 Git。',
+    points: ['GitOps：push → webhook → 分服务热重载', 'Astro 站点容器化构建 45 秒发布', 'GitHub Actions 自托管 Runner，掉线自愈'],
+    stack: ['Proxmox', 'Docker', 'Tailscale', 'Cloudflare', 'Caddy', 'Gitea'],
+    href: '/projects/#homelab',
+  },
+  {
+    title: 'cf-ai-proxy',
+    tag: 'Open Source',
+    desc: '单文件、零依赖的 Cloudflare Workers AI 网关：把 Workers AI 包装成标准 OpenAI 接口，支持流式对话、文生图和一个内置生图页面。',
+    points: ['OpenAI 兼容 /v1/models、chat、images', '流式 SSE 透传，无第三方依赖', '可接 Open WebUI / SillyTavern / 任意 SDK'],
+    stack: ['Python', 'Workers AI', 'OpenAI API', 'Docker'],
+    href: '/projects/#cf-ai-proxy',
+  },
+  {
+    title: 'AI 推理与 RAG 栈',
+    tag: 'AI Engineering',
+    desc: '本地 llama.cpp GPU 推理 + bge-m3 向量服务，统一支撑聊天、角色扮演与知识库检索；并接入 Workers AI 作为弹性后备模型。',
+    points: ['9B 模型：35 t/s，32K 上下文，KV cache 量化', 'bge-m3 统一 embedding，多客户端共用', '模型自主调用工具完成文生图'],
+    stack: ['llama.cpp', 'CUDA', 'bge-m3', 'Open WebUI', 'SillyTavern'],
+    href: '/projects/#ai-stack',
+  },
 ];
 ---
 
-<Base>
-  <h1>silveryj</h1>
-  <p class="sub">个人站 · 自托管实验室 · 写点东西</p>
+<Base
+  title="silveryj · 自托管与基础设施"
+  description="自托管家庭云平台、GitOps 部署与 AI 推理工程实践。"
+>
+  <section class="hero">
+    <p class="eyebrow">Homelab · Infrastructure · AI Engineering</p>
+    <h1>silveryj</h1>
+    <p class="sub">
+      我在自己家里维护一套自托管云：Proxmox 跑虚拟化，Tailscale 做内网，Cloudflare 做公网入口，
+      配置与部署全部纳入 Git。这里记录工程实践、故障排查和踩过的坑。
+    </p>
+    <p class="hero-links">
+      <a class="btn" href="/projects/">查看项目</a>
+      <a class="btn ghost" href="/blog/">读文章</a>
+      <a class="btn ghost" href="/about/">关于我</a>
+    </p>
+  </section>
 
-  <ul class="grid">
-    {links.map((l) => (
-      <li>
-        <a href={l.href}>
-          <strong>{l.name}</strong>
-          <span>{l.desc}</span>
-        </a>
-      </li>
+  <h2>精选项目</h2>
+  <div class="projects">
+    {featured.map((p) => (
+      <a class="project-card" href={p.href}>
+        <div class="pc-head">
+          <strong>{p.title}</strong>
+          <span class="pc-tag">{p.tag}</span>
+        </div>
+        <p class="pc-desc">{p.desc}</p>
+        <ul class="pc-points">
+          {p.points.map((pt) => <li>{pt}</li>)}
+        </ul>
+        <div class="pc-stack">
+          {p.stack.map((s) => <span>{s}</span>)}
+        </div>
+      </a>
     ))}
-  </ul>
+  </div>
 
   {posts.length > 0 && (
-    <>
+    <section>
       <h2>最新文章</h2>
       <ul class="post-list">
         {posts.map((post) => (
@@ -43,7 +83,41 @@ const links = [
           </li>
         ))}
       </ul>
-      <p style="margin-top: 20px"><a href="/blog/">全部文章 →</a></p>
-    </>
+      <p style="margin-top: 18px"><a href="/blog/">全部文章 →</a></p>
+    </section>
   )}
 </Base>
+
+<style is:global>
+  .hero { padding: 8px 0 28px; }
+  .eyebrow {
+    font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 10px;
+  }
+  .hero h1 { font-size: 42px; margin: 0 0 8px; letter-spacing: -.02em; }
+  .hero .sub { font-size: 15.5px; line-height: 1.75; max-width: 680px; color: var(--muted); }
+  .hero-links { margin: 22px 0 0; display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 9px 18px; border-radius: 10px;
+    background: var(--accent); color: #07131f; text-decoration: none;
+    font-size: 13.5px; font-weight: 600;
+  }
+  .btn.ghost { background: transparent; border: 1px solid var(--line); color: var(--fg); }
+  .btn.ghost:hover { border-color: #3f5a78; }
+
+  .projects { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin: 14px 0 34px; }
+  .project-card {
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 20px; border-radius: 14px; text-decoration: none; color: inherit;
+    background: var(--card); border: 1px solid var(--line);
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .project-card:hover { transform: translateY(-3px); border-color: #3f5a78; }
+  .pc-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .pc-head strong { font-size: 16.5px; }
+  .pc-tag { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
+  .pc-desc { margin: 0; font-size: 13.5px; line-height: 1.7; color: #c3d0de; }
+  .pc-points { margin: 0; padding-left: 17px; font-size: 12.5px; line-height: 1.7; color: var(--muted); }
+  .pc-stack { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+  .pc-stack span { font-size: 11px; color: var(--muted); background: #101720; border: 1px solid var(--line); border-radius: 6px; padding: 2px 7px; }
+</style>

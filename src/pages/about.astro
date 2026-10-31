@@ -1,0 +1,90 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="关于" description="关于 silveryj：自托管、基础设施与 AI 工程。">
+  <h1>关于</h1>
+  <p class="sub">
+    我喜欢把东西自己搭起来，然后把它维护好。这个站点和背后的整套平台，都是这么来的。
+  </p>
+
+  <h2>我在做什么</h2>
+  <p>
+    日常是在家里那台小型服务器上折腾：Proxmox 虚拟化、Docker 化服务、Tailscale 组网、Cloudflare 边缘；
+    同时跑本地大模型，把聊天、检索、角色扮演和图片生成串成一条能用的链路。
+  </p>
+  <p>
+    我关心的不是"能跑就行"，而是：配置能不能进 Git、部署能不能自动、出问题能不能定位、
+    密钥会不会泄漏、磁盘和流量能不能撑住。
+  </p>
+
+  <h2>技能</h2>
+  <div class="skills">
+    <div>
+      <h3>基础设施</h3>
+      <p>Proxmox VE · Linux · Docker / Compose · Caddy · nginx · MariaDB · Redis · Samba</p>
+    </div>
+    <div>
+      <h3>网络与边缘</h3>
+      <p>Tailscale（MagicDNS / Services） · Cloudflare（Tunnel / Access / DNS / Workers AI） · 反向代理与 TLS</p>
+    </div>
+    <div>
+      <h3>自动化与 GitOps</h3>
+      <p>Git（Gitea / GitHub） · Webhook 部署 · GitHub Actions 自托管 Runner · Bash / Python / PowerShell</p>
+    </div>
+    <div>
+      <h3>AI 工程</h3>
+      <p>llama.cpp · CUDA 推理 · embedding（bge-m3） · RAG · Agent 工具调用 · OpenAI 兼容接口</p>
+    </div>
+    <div>
+      <h3>Web</h3>
+      <p>Astro · WordPress · HTML / CSS / TypeScript · 响应式与可访问性基础</p>
+    </div>
+  </div>
+
+  <h2>时间线</h2>
+  <ul class="timeline">
+    <li>
+      <time>2026 · 10</time>
+      <div>
+        <strong>自托管平台成型</strong>
+        <p>GitOps 部署链路、GitHub Actions 双向同步、Cloudflare Access 零信任、AI 推理与 RAG 栈整合。</p>
+      </div>
+    </li>
+    <li>
+      <time>2026 · 10</time>
+      <div>
+        <strong>cf-ai-proxy 开源</strong>
+        <p>把 Cloudflare Workers AI 接入本地 AI 栈，抽成零依赖的单文件网关。</p>
+      </div>
+    </li>
+    <li>
+      <time>更早</time>
+      <div>
+        <strong>逐步搭建</strong>
+        <p>从 WordPress / 静态站开始，一点点替换成自己维护的基础设施。</p>
+      </div>
+    </li>
+  </ul>
+
+  <h2>联系</h2>
+  <p>
+    邮箱：<a href="mailto:adriantzj07@gmail.com">adriantzj07@gmail.com</a><br />
+    GitHub：<a href="https://github.com/silveryj-atzj" target="_blank" rel="noopener noreferrer">silveryj-atzj</a>
+  </p>
+
+  <p class="back"><a href="/">← 返回首页</a></p>
+</Base>
+
+<style is:global>
+  .skills { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin: 16px 0 8px; }
+  .skills > div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .skills h3 { margin: 0 0 6px; font-size: 14px; }
+  .skills p { margin: 0; font-size: 13px; line-height: 1.7; color: var(--muted); }
+  .timeline { list-style: none; padding: 0; margin: 16px 0; }
+  .timeline li { display: flex; gap: 18px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .timeline time { flex: 0 0 90px; font-size: 12px; color: var(--muted); padding-top: 3px; }
+  .timeline strong { display: block; margin-bottom: 3px; }
+  .timeline p { margin: 0; font-size: 13.5px; color: #c3d0de; line-height: 1.7; }
+  .back { margin-top: 36px; }
+</style>

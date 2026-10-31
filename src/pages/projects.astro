@@ -1,0 +1,78 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="项目" description="自托管平台、GitOps 部署、AI 推理与开源的工程实践。">
+  <h1>项目</h1>
+  <p class="sub">从基础设施到 AI 应用，都是自己搭建、自己维护、自己踩坑修出来的。</p>
+
+  <article class="case" id="homelab">
+    <h2>自托管家庭云平台</h2>
+    <p class="meta">Infrastructure · GitOps · Zero Trust</p>
+    <p>
+      在 Proxmox VE 上维护 5 个 LXC、19 个容器化服务：Web 站点、Git 服务、AI 推理、对象存储与内网面板。
+      目标是让家里所有服务可复现、可回滚、可远程安全访问，而不是一堆"装完就忘"的机器。
+    </p>
+    <h3>做了什么</h3>
+    <ul>
+      <li><strong>内网零端口</strong>：Tailscale MagicDNS + Services VIP，9 个服务通过 443 域名访问，不记 IP、不暴露端口。</li>
+      <li><strong>公网最小暴露</strong>：Cloudflare Tunnel 接入，对外只有 WordPress、博客和 Telegram webhook 三个入口，其余一律 404。</li>
+      <li><strong>GitOps 部署</strong>：Gitea webhook → 宿主机部署服务 → 按仓库分发到各 LXC，Caddy 热重载、容器按需重建。</li>
+      <li><strong>静态站流水线</strong>：push 后 45 秒内完成 node 容器构建并发布到 Caddy。</li>
+      <li><strong>CI 双通道</strong>：GitHub Actions 自托管 Runner 负责 GitHub ↔ 内网双向同步；Runner 掉线由 systemd 定时器自动重新注册。</li>
+    </ul>
+    <h3>难点</h3>
+    <ul>
+      <li>Cloudflare 终止 TLS 后，反向代理覆盖 <code>X-Forwarded-Proto</code> 导致 WordPress 强制 HTTPS 死循环——通过显式注入请求头 + 框架侧兜底解决。</li>
+      <li>容器内 CUDA 运行库被空目录遮蔽，推理进程直接 139 崩溃——逐层校验动态库后修复。</li>
+      <li>Caddy 指令顺序（handle / route / redirect 优先级）导致路由静默失效，用最小化 matcher 复现后修正。</li>
+    </ul>
+    <p class="stack">Proxmox · Docker · Tailscale · Cloudflare · Caddy · Gitea · GitHub Actions · nginx · MariaDB · Redis</p>
+  </article>
+
+  <article class="case" id="cf-ai-proxy">
+    <h2>cf-ai-proxy</h2>
+    <p class="meta">Open Source · Python · Cloudflare Workers AI</p>
+    <p>
+      Cloudflare Workers AI 有不错的免费额度，但接口形状和 OpenAI 不完全一致。这个单文件、零依赖的代理把
+      Workers AI 包装成标准 OpenAI 接口，任何兼容客户端都能直接用。
+    </p>
+    <ul>
+      <li>标准 <code>/v1/models</code>、<code>/v1/chat/completions</code>（支持 SSE 流式）、<code>/v1/images/generations</code>。</li>
+      <li>内置 <code>/ui</code> 文生图页面，方便直接验证模型。</li>
+      <li>只用 Python 标准库，Docker 镜像极小，可跑在 NAS、树莓派或任意内网机器。</li>
+      <li>可选 Bearer 鉴权、可配置模型列表。</li>
+    </ul>
+    <p class="stack">Python · Workers AI · OpenAI API · Docker</p>
+  </article>
+
+  <article class="case" id="ai-stack">
+    <h2>本地 AI 推理与 RAG 栈</h2>
+    <p class="meta">AI Engineering · llama.cpp · Embeddings</p>
+    <p>
+      在 4GB 显存的小卡上跑 9B 模型，并同时支撑聊天、角色扮演和知识库检索。
+    </p>
+    <ul>
+      <li>llama.cpp 调优：权重全上 GPU、KV cache 量化、32K 上下文，稳定 35 t/s 生成。</li>
+      <li>bge-m3 向量服务（CPU）统一为多个前端提供 embedding，避免重复下载与索引。</li>
+      <li>接入 Workers AI 作为弹性后备模型，并让模型通过工具调用自主完成文生图。</li>
+      <li>Telegram 机器人常驻服务端：读取角色卡、调用推理后端、按需生成图片并回传。</li>
+    </ul>
+    <p class="stack">llama.cpp · CUDA · bge-m3 · Open WebUI · SillyTavern · Telegram Bot</p>
+  </article>
+
+  <p class="back"><a href="/">← 返回首页</a></p>
+</Base>
+
+<style is:global>
+  .case { border-top: 1px solid var(--line); padding-top: 26px; margin-top: 30px; }
+  .case:first-of-type { border-top: 0; padding-top: 0; }
+  .case h2 { font-size: 23px; margin: 0 0 4px; }
+  .case h3 { font-size: 15px; margin: 22px 0 8px; color: #c3d0de; }
+  .case .meta { color: var(--muted); font-size: 12px; letter-spacing: .05em; text-transform: uppercase; margin: 0 0 14px; }
+  .case p { line-height: 1.8; }
+  .case ul { line-height: 1.85; padding-left: 20px; }
+  .case code { background: #121a23; border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; font-size: 12.5px; }
+  .case .stack { margin-top: 14px; font-size: 12px; color: var(--muted); }
+  .back { margin-top: 40px; }
+</style>
