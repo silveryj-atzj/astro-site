@@ -143,3 +143,5 @@ Both paths publish to the same static directory served by Caddy.
 ## License
 
 MIT
+
+<!-- CI/CD 验证: GitHub Actions sync-to-server end-to-end test -->
