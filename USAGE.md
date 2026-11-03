@@ -1,108 +1,108 @@
-# Astro åšå®¢ Â· ä½¿ç”¨è¯´æ˜Ž
+# Astro 博客 · 使用说明
 
-çº¿ä¸Šåœ°å€ï¼š**https://blog.silveryj-atzj.me**
-ä»£ç ä»“åº“ï¼š`atzj/web-astro`ï¼ˆGitea: https://web-gitea.tailbd4708.ts.net/atzj/web-astroï¼‰
-æœ¬åœ°ç›®å½•ï¼š`D:\Ju\Projects\Web\Astro`
+线上地址：**https://blog.silveryj-atzj.me**
+代码仓库：`atzj/web-astro`（Gitea: https://web-gitea.tailbd4708.ts.net/atzj/web-astro）
+本地目录：`D:\Ju\Projects\Web\Astro`
 
 ---
 
-## 1. æœ¬åœ°é¢„è§ˆï¼ˆæ”¹å®Œå…ˆçœ‹æ•ˆæžœï¼‰
+## 1. 本地预览（改完先看效果）
 
 ```powershell
 cd D:\Ju\Projects\Web\Astro
 npm run dev
-# æ‰“å¼€ http://localhost:4321
+# 打开 http://localhost:4321
 ```
 
-## 2. å†™ä¸€ç¯‡æ–°æ–‡ç« 
+## 2. 写一篇新文章
 
-åœ¨ `src/content/blog/` æ–°å»ºä¸€ä¸ª `.md` æ–‡ä»¶ï¼Œä¾‹å¦‚ `my-first-post.md`ï¼š
+在 `src/content/blog/` 新建一个 `.md` 文件，例如 `my-first-post.md`：
 
 ```markdown
 ---
-title: æˆ‘çš„ç¬¬ä¸€ç¯‡æ–‡ç« 
-description: ä¸€å¥è¯æ‘˜è¦ï¼ˆä¼šæ˜¾ç¤ºåœ¨åˆ—è¡¨é‡Œï¼‰
+title: 我的第一篇文章
+description: 一句话摘要（会显示在列表里）
 date: 2026-11-01
-tags: [éšç¬”, ç”Ÿæ´»]
+tags: [随笔, 生活]
 draft: false
 ---
 
-æ­£æ–‡å†™åœ¨è¿™é‡Œï¼Œæ”¯æŒ Markdownã€‚
+正文写在这里，支持 Markdown。
 ```
 
-- `draft: true` â†’ ä¸å‘å¸ƒï¼ˆæœ¬åœ°ä¹Ÿçœ‹ä¸åˆ°ï¼‰
-- æ–‡ä»¶åå°±æ˜¯ URLï¼š`my-first-post.md` â†’ `/blog/my-first-post/`
-- æ ‡ç­¾ä¼šè‡ªåŠ¨å‡ºçŽ°åœ¨ `/tags/` å’Œæ–‡ç« é‡Œçš„ chip
+- `draft: true` → 不发布（本地也看不到）
+- 文件名就是 URL：`my-first-post.md` → `/blog/my-first-post/`
+- 标签会自动出现在 `/tags/` 和文章里的 chip
 
-## 3. å‘å¸ƒï¼ˆéƒ¨ç½²ï¼‰
+## 3. 发布（部署）
 
 ```powershell
 powershell -File scripts\deploy.ps1
 ```
-å®ƒä¼šï¼šbuild â†’ æ‰“åŒ…ï¼ˆPython zipï¼‰â†’ ä¸Šä¼  â†’ è§£åŽ‹åˆ° Caddy â†’ è‡ªåŠ¨éªŒè¯ 6 ä¸ªé¡µé¢è¿”å›ž 200ã€‚
+它会：build → 打包（Python zip）→ 上传 → 解压到 Caddy → 自动验证 6 个页面返回 200。
 
-> ä¸è¦ç”¨ Windows è‡ªå¸¦ `tar` æ‰“åŒ…è¿™ä¸ªç›®å½•ï¼ˆä¸­æ–‡æ–‡ä»¶åä¼šè®©å®ƒå´©æºƒï¼‰ï¼Œè„šæœ¬å·²æ”¹ç”¨ Pythonã€‚
+> 不要用 Windows 自带 `tar` 打包这个目录（中文文件名会让它崩溃），脚本已改用 Python。
 
-## 4. æ”¹è®¾è®¡ï¼ˆé¢œè‰² / å­—ä½“ / å¸ƒå±€ï¼‰
+## 4. 改设计（颜色 / 字体 / 布局）
 
-éƒ½åœ¨ **`src/layouts/Base.astro`** åº•éƒ¨çš„ `<style is:global>` é‡Œï¼š
+都在 **`src/layouts/Base.astro`** 底部的 `<style is:global>` 里：
 
 ```css
 :root {
-  --bg: #0b0d10;      /* èƒŒæ™¯ */
-  --card: #14181d;    /* å¡ç‰‡ */
-  --line: #232a32;    /* è¾¹æ¡† */
-  --fg: #e6edf3;      /* æ–‡å­— */
-  --muted: #8b98a5;   /* æ¬¡è¦æ–‡å­— */
-  --accent: #6ea8fe;  /* å¼ºè°ƒè‰²ï¼ˆé“¾æŽ¥/ç„¦ç‚¹ï¼‰ */
+  --bg: #0b0d10;      /* 背景 */
+  --card: #14181d;    /* 卡片 */
+  --line: #232a32;    /* 边框 */
+  --fg: #e6edf3;      /* 文字 */
+  --muted: #8b98a5;   /* 次要文字 */
+  --accent: #6ea8fe;  /* 强调色（链接/焦点） */
 }
 ```
-æ”¹è¿™å‡ ä¸ªå˜é‡å°±èƒ½æ¢æ•´ä½“é£Žæ ¼ï¼›å­—å·/é—´è·ä¹Ÿéƒ½åœ¨åŒä¸€æ®µ CSS é‡Œã€‚
+改这几个变量就能换整体风格；字号/间距也都在同一段 CSS 里。
 
-## 5. æ”¹å¯¼èˆª / é¦–é¡µ / é¡µè„š
+## 5. 改导航 / 首页 / 页脚
 
-| æƒ³æ”¹ä»€ä¹ˆ | æ–‡ä»¶ |
+| 想改什么 | 文件 |
 |---|---|
-| é¡¶éƒ¨å¯¼èˆªã€é¡µè„šã€`<head>` | `src/layouts/Base.astro` |
-| é¦–é¡µï¼ˆæœåŠ¡å…¥å£ + æœ€æ–°æ–‡ç« ï¼‰ | `src/pages/index.astro` |
-| åšå®¢åˆ—è¡¨ | `src/pages/blog/index.astro` |
-| æ–‡ç« é¡µæ ·å¼ï¼ˆæ ‡é¢˜/æ­£æ–‡æŽ’ç‰ˆï¼‰ | `src/pages/blog/[...slug].astro` + Base é‡Œçš„ `.prose` |
-| æ ‡ç­¾é¡µ / å½’æ¡£ / æœç´¢ | `src/pages/tags/`ã€`src/pages/archive.astro`ã€`src/pages/search.astro` |
+| 顶部导航、页脚、`<head>` | `src/layouts/Base.astro` |
+| 首页（服务入口 + 最新文章） | `src/pages/index.astro` |
+| 博客列表 | `src/pages/blog/index.astro` |
+| 文章页样式（标题/正文排版） | `src/pages/blog/[...slug].astro` + Base 里的 `.prose` |
+| 标签页 / 归档 / 搜索 | `src/pages/tags/`、`src/pages/archive.astro`、`src/pages/search.astro` |
 
-## 6. çŽ°æœ‰é¡µé¢
+## 6. 现有页面
 
-| è·¯å¾„ | è¯´æ˜Ž |
+| 路径 | 说明 |
 |---|---|
-| `/` | é¦–é¡µï¼ˆæœåŠ¡å…¥å£ + æœ€æ–° 3 ç¯‡æ–‡ç« ï¼‰ |
-| `/blog/` | æ–‡ç« åˆ—è¡¨ |
-| `/blog/<slug>/` | æ–‡ç« æ­£æ–‡ï¼ˆå«é˜…è¯»æ—¶é—´ã€æ ‡ç­¾ã€ä¸Šä¸€ç¯‡/ä¸‹ä¸€ç¯‡ï¼‰ |
-| `/tags/`ã€`/tags/<æ ‡ç­¾>/` | æ ‡ç­¾äº‘ / æŒ‰æ ‡ç­¾æµè§ˆ |
-| `/archive/` | æŒ‰å¹´ä»½å½’æ¡£ |
-| `/search/` | å®¢æˆ·ç«¯æ¨¡ç³Šæœç´¢ï¼ˆFuse.jsï¼Œæ— åŽç«¯ï¼‰ |
-| `/rss.xml` | RSS è®¢é˜… |
-| `/sitemap-index.xml` | æœç´¢å¼•æ“Ž sitemap |
+| `/` | 首页（服务入口 + 最新 3 篇文章） |
+| `/blog/` | 文章列表 |
+| `/blog/<slug>/` | 文章正文（含阅读时间、标签、上一篇/下一篇） |
+| `/tags/`、`/tags/<标签>/` | 标签云 / 按标签浏览 |
+| `/archive/` | 按年份归档 |
+| `/search/` | 客户端模糊搜索（Fuse.js，无后端） |
+| `/rss.xml` | RSS 订阅 |
+| `/sitemap-index.xml` | 搜索引擎 sitemap |
 
-## 7. æäº¤åˆ°ä»“åº“
+## 7. 提交到仓库
 
 ```powershell
 cd D:\Ju\Projects\Web\Astro
 git add -A
-git commit -m "æ–°æ–‡ç«  / æ”¹äº†ä»€ä¹ˆ"
+git commit -m "新文章 / 改了什么"
 git push
 ```
-ï¼ˆGitea åœ°å€å·²é…ç½®å¥½ï¼Œé¦–æ¬¡ push è¦è¾“è´¦å· `atzj` + å¯†ç ï¼‰
+（Gitea 地址已配置好，首次 push 要输账号 `atzj` + 密码）
 
-## 8. ä»¥åŽå¯åŠ çš„ä¸œè¥¿
+## 8. 以后可加的东西
 
-- æ¯ç¯‡æ–‡ç« è‡ªåŠ¨ç”Ÿæˆç¤¾äº¤åˆ†äº«å›¾ï¼ˆOG imageï¼‰
-- ä»£ç é«˜äº®ä¸»é¢˜ï¼ˆ`astro.config.mjs` åŠ  Shiki é…ç½®ï¼‰
-- é˜…è¯»é‡/è¯„è®ºï¼ˆgiscusï¼‰
-- Gitea webhook è‡ªåŠ¨æž„å»ºéƒ¨ç½²ï¼ˆpush åŽä¸ç”¨æ‰‹åŠ¨è·‘è„šæœ¬ï¼‰
+- 每篇文章自动生成社交分享图（OG image）
+- 代码高亮主题（`astro.config.mjs` 加 Shiki 配置）
+- 阅读量/评论（giscus）
+- Gitea webhook 自动构建部署（push 后不用手动跑脚本）
 
 ---
 
 ## 8. 自动部署
 
-已接 Gitea webhook：push 到 tzj/web-astro 后，服务器会自动构建并部署（不需要再跑 deploy.ps1）。
+已接 Gitea webhook：push 到 atzj/web-astro 后，服务器会自动构建并部署（不需要再跑 deploy.ps1）。
 日志：PVE 宿主机 /var/log/infra-hook.log。
 
